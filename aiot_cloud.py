@@ -17,7 +17,7 @@ API_DOMAIN = {
     "GER": "open-ger.aqara.com",
 }
 
-# apply APP_ID，KEY_ID 、APP_KEY from https://developer.aqara.com/
+# apply APP_ID, KEY_ID 、APP_KEY from https://developer.aqara.com/
 
 APP_ID = "88110776288481280040ace0"
 KEY_ID = "K.881107763014836224"
@@ -64,7 +64,7 @@ class AiotCloud:
         self.api_url = f"https://{API_DOMAIN[country]}/v3.0/open/api"
 
     def _get_request_headers(self):
-        """生成Headers"""
+        """Generate Headers"""
         nonce = get_random_string(16)
         timestamp = str(int(round(time.time() * 1000)))
         sign = gen_sign(
@@ -86,7 +86,7 @@ class AiotCloud:
     async def _async_invoke_aqara_cloud_api(
         self, intent: str, only_result: bool = True, list_data: bool = False, **kwargs
     ):
-        """调用Aqara Api"""
+        """Request Aqara Api"""
         try:
             empty_keys = []
             for k, v in kwargs.items():
@@ -109,17 +109,17 @@ class AiotCloud:
             if only_result:
                 # 这里的异常处理需要优化
                 if jo["code"] != 0:
-                    _LOGGER.warn(f"调用Aiot api失败，返回值：{jo}")
+                    _LOGGER.warn(f"Request Aiot api fail, return value: {jo}")
                     if jo["code"] == 108:
-                        _LOGGER.warn(f"Aiot令牌过期或异常，正在尝试自动刷新！")
+                        _LOGGER.warn(f"Aiot token expired or abnormal, trying to refresh automatically")
                         new_jo = await self.async_refresh_token(self.refresh_token)
                         if new_jo["code"] == 0:
-                            _LOGGER.info(f"Aiot令牌更新成功！")
+                            _LOGGER.info(f"Aiot token updated successfully")
                             return await self._async_invoke_aqara_cloud_api(
                                 intent, only_result, list_data, **kwargs
                             )
                         else:
-                            _LOGGER.warn("Aiot令牌更新失败，请重新授权！")
+                            _LOGGER.warn("Aiot token update failed, please re-authorize!")
                 return jo.get("result")
             else:
                 return jo
@@ -130,7 +130,7 @@ class AiotCloud:
     async def async_get_auth_code(
         self, account: str, account_type: int, access_token_validity: str = "7d"
     ):
-        """获取授权验证码"""
+        """Obtain authorization verification code"""
         return await self._async_invoke_aqara_cloud_api(
             intent="config.auth.getAuthCode",
             only_result=False,
@@ -140,7 +140,7 @@ class AiotCloud:
         )
 
     async def async_get_token(self, authCode: str, account: str, account_type: int):
-        """获取访问令牌"""
+        """get access token"""
         jo = await self._async_invoke_aqara_cloud_api(
             intent="config.auth.getToken",
             only_result=False,
@@ -157,7 +157,7 @@ class AiotCloud:
         return jo
 
     async def async_refresh_token(self, refresh_token: str):
-        """刷新访问令牌"""
+        """refresh access token"""
         jo = await self._async_invoke_aqara_cloud_api(
             intent="config.auth.refreshToken",
             only_result=False,
@@ -178,7 +178,7 @@ class AiotCloud:
         page_num: int = None,
         page_size: int = None,
     ):
-        """查询设备信息"""
+        """Query device information"""
         resp = await self._async_invoke_aqara_cloud_api(
             intent="query.device.info",
             dids=dids,
@@ -189,7 +189,7 @@ class AiotCloud:
         return resp.get("data")
 
     async def async_query_all_devices_info(self, page_size: int = 50):
-        """查询所有设备信息"""
+        """Query all device information"""
         continue_flag = True
         page_num = 1
         devices = []
@@ -204,19 +204,19 @@ class AiotCloud:
         return devices
 
     async def async_query_device_sub_info(self, did: str):
-        """查询网关下子设备信息"""
+        """Query sub-device information under the gateway"""
         return await self._async_invoke_aqara_cloud_api(
             intent="query.device.subInfo", did=did
         )
 
     async def async_query_resource_info(self, model: str, resource_id: str = None):
-        """查询已开放的资源详情"""
+        """Query the details of open resources"""
         return await self._async_invoke_aqara_cloud_api(
             intent="query.resource.info", model=model, resourceId=resource_id
         )
 
     async def async_query_resource_value(self, subject_id: str, resource_ids: list):
-        """查询资源信息"""
+        """Query resource information"""
         return await self._async_invoke_aqara_cloud_api(
             intent="query.resource.value",
             resources=[{"subjectId": subject_id, "resourceIds": resource_ids}],
@@ -225,7 +225,7 @@ class AiotCloud:
     async def async_write_resource_device(
         self, subject_id: str, resource_id: str, value: str
     ):
-        """控制设备"""
+        """controlling device"""
         return await self._async_invoke_aqara_cloud_api(
             intent="write.resource.device",
             list_data=True,

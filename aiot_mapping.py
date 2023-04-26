@@ -20,7 +20,7 @@ MK_INIT_PARAMS = "init_params"
 MK_RESOURCES = "resources"
 
 AIOT_DEVICE_MAPPING = {
-    # Aqara M1S网关
+    # Aqara M1S Gateway
     "lumi.gateway.acn01": {
         "light": {
             MK_INIT_PARAMS: {
@@ -34,27 +34,27 @@ AIOT_DEVICE_MAPPING = {
             },
         }
     },
-    # 智能墙壁开关T1（单火单键）
+    # Smart wall switch T1 (single fire and single key)
     "lumi.switch.b1lacn01": {
         "switch": {
             MK_RESOURCES: {"toggle": ("4.1.85", "_attr_is_on")},
         }
     },
-    # 智能墙壁开关T1（单火双键）
+    # Smart wall switch T1 (single fire double button)
     "lumi.switch.b2lacn01": {
         "switch": {
             MK_MAPPING_PARAMS: {"ch_count": 2},
             MK_RESOURCES: {"toggle": ("4.{}.85", "_attr_is_on")},
         }
     },
-    # 智能墙壁开关T1（单火三键）
+    # Smart wall switch T1 (single fire and three keys)
     "lumi.switch.b3l01": {
         "switch": {
             MK_MAPPING_PARAMS: {"ch_count": 3},
             MK_RESOURCES: {"toggle": ("4.{}.85", "_attr_is_on")},
         }
     },
-    # VRF空调控制器
+    # VRF air conditioner controller
     "lumi.airrtc.vrfegl01": {
         "climate": {
             MK_INIT_PARAMS: {
@@ -69,7 +69,7 @@ AIOT_DEVICE_MAPPING = {
             MK_RESOURCES: {"ac_state": ("14.{}.85", "_state_str")},
         }
     },
-    # Aqara智能窗帘电机（锂电池开合帘版）
+    # Aqara Smart Curtain Motor (Lithium Battery Opening and Closing Curtain Version)
     "lumi.curtain.hagl04": {
         "cover": {
             MK_INIT_PARAMS: {
@@ -90,21 +90,21 @@ AIOT_DEVICE_MAPPING = {
             MK_RESOURCES: {"battery": ("8.0.2001", "_attr_native_value")},
         },
     },
-    # 无线开关 T1（贴墙式单键）
+    # Wireless switch T1 (wall-mounted one-button)
     "lumi.remote.b186acn03": {
         "sensor": {
             MK_INIT_PARAMS: {"device_class": "battery", "state_class": "measurement"},
             MK_RESOURCES: {"battery": ("8.0.2001", "_attr_native_value")},
         }
     },
-    # 无线开关 T1（贴墙式双键）
+    # Wireless switch T1 (wall-mounted double button)
     "lumi.remote.b286acn03": {
         "sensor": {
             MK_INIT_PARAMS: {"device_class": "battery", "state_class": "measurement"},
             MK_RESOURCES: {"battery": ("8.0.2001", "_attr_native_value")},
         }
     },
-    # 高精度人体传感器
+    # High-precision human body sensor
     "lumi.motion.agl04": {
         "sensor": {
             MK_INIT_PARAMS: {"device_class": "battery", "state_class": "measurement"},
@@ -114,7 +114,7 @@ AIOT_DEVICE_MAPPING = {
 }
 
 SPECIAL_DEVICES_INFO = {
-    # VRF空调控制器
+    # VRF air conditioner controller
     "lumi.airrtc.vrfegl01": {
         "toggle": {0: "on", 1: "off"},
         "hvac_mode": {

@@ -98,14 +98,14 @@ class AiotEntityBase(Entity):
         return self._res_params[res_name][0].format(self._channel)
 
     async def async_set_res_value(self, res_name, value):
-        """设置资源值"""
+        """set resource value"""
         res_id = self.get_res_id_by_name(res_name)
         return await self._aiot_manager.session.async_write_resource_device(
             self.device.did, res_id, value
         )
 
     async def async_fetch_res_values(self, *args):
-        """获取资源值"""
+        """get resource value"""
         res_ids = []
         if len(args) > 0:
             res_ids = args
@@ -124,7 +124,7 @@ class AiotEntityBase(Entity):
             await self.async_set_attr(x["resourceId"], x["value"], write_ha_state=False)
 
     async def async_set_resource(self, res_name, attr_value):
-        """设置aiot resource的值"""
+        """Set the value of aiot resource"""
         tup_res = self._res_params.get(res_name)
         res_value = attr_value
         current_value = getattr(self, tup_res[1])
@@ -138,7 +138,7 @@ class AiotEntityBase(Entity):
         return resp
 
     async def async_set_attr(self, res_id, res_value, write_ha_state=True):
-        """设置ha attr的值"""
+        """Set the value of ha attr"""
         res_name = next(
             k
             for k, v in self._res_params.items()
@@ -153,11 +153,11 @@ class AiotEntityBase(Entity):
                 self.async_write_ha_state()  # 初始化的时候不能执行这句话，会创建其他乱七八糟的对象
 
     def convert_attr_to_res(self, res_name, attr_value):
-        """从attr转换到res"""
+        """Convert from attr to res"""
         return attr_value
 
     def convert_res_to_attr(self, res_name, res_value):
-        """从res转换到attr"""
+        """Convert from res to attr"""
         return res_value
 
 
@@ -214,40 +214,40 @@ class AiotManager:
         self._msg_handler = AiotMessageHandler(asyncio.get_event_loop())
         self._msg_handler.start(self._msg_callback)
 
-    # Aiot会话
+    # Aiot session
     _session: AiotCloud = None
 
-    # 所有设备
+    # all equipment
     _all_devices: dict[str, list[AiotDevice]] = {}
 
-    # 所有在HA中管理的设备
+    # All devices managed in HA
     _managed_devices: dict[str, AiotDevice] = {}
 
-    # 配置对象和设备的对应关系，1：N
+    # Correspondence between configuration objects and devices, 1:N
     _entries_devices: dict[str, list[str]] = {}
 
-    # 所有配置对象
+    # all configuration objects
     _config_entries: dict[str, ConfigEntry] = {}
 
-    # 设备和实体的对应关系，1：N
+    # Correspondence between equipment and entities, 1:N
     _devices_entities: dict[str, list[AiotEntityBase]] = {}
 
-    # 插件不支持的设备列表
+    # List of devices not supported by the plugin
     _unsupported_devices: list[AiotDevice] = []
 
     @property
     def session(self) -> AiotCloud:
-        """与Aiot建立的会话"""
+        """Establish session with Aiot"""
         return self._session
 
     @property
     def all_devices(self) -> list[AiotDevice]:
-        """获取Aiot Cloud上的所有设备"""
+        """Get all devices on Aiot Cloud"""
         return self._all_devices.values()
 
     @property
     def unmanaged_gateways(self) -> list[AiotDevice]:
-        """获取HA为管理的网关设备"""
+        """Get HA for the managed gateway device"""
         gateways = []
         [
             gateways.append(x)
@@ -258,15 +258,15 @@ class AiotManager:
 
     @property
     def unsupported_devices(self) -> list[AiotDevice]:
-        """插件不支持的设备列表"""
+        """List of devices not supported by the plugin"""
         devices = []
         [devices.append(x) for x in self._all_devices.values() if not x.is_supported]
         return devices
 
     async def _msg_callback(self, msg):
-        """消息推送格式，见https://opendoc.aqara.cn/docs/%E4%BA%91%E5%AF%B9%E6%8E%A5%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81/%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81%E6%A0%BC%E5%BC%8F.html"""
+        """message push format,see https://opendoc.aqara.cn/docs/%E4%BA%91%E5%AF%B9%E6%8E%A5%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81/%E6%B6%88%E6%81%AF%E6%8E%A8%E9%80%81%E6%A0%BC%E5%BC%8F.html"""
         if msg.get("msgType"):
-            # 属性消息，resource_report
+            # property message, resource_report
             for x in msg["data"]:
                 entities = self._devices_entities.get(x["subjectId"])
                 if entities:
@@ -274,28 +274,28 @@ class AiotManager:
                         if x["resourceId"] in entity.supported_resources:
                             await entity.async_set_attr(x["resourceId"], x["value"])
         elif msg.get("eventType"):
-            # 事件消息
-            if msg["eventType"] == "gateway_bind":  # 网关绑定
+            # event message
+            if msg["eventType"] == "gateway_bind":  # gateway binding
                 pass
-            elif msg["eventType"] == "subdevice_bind":  # 子设备绑定
+            elif msg["eventType"] == "subdevice_bind":  # Sub-device binding
                 pass
-            elif msg["eventType"] == "gateway_unbind":  # 网关解绑
+            elif msg["eventType"] == "gateway_unbind":  # unbind gateway
                 pass
-            elif msg["eventType"] == "unbind_sub_gw":  # 子设备解绑
+            elif msg["eventType"] == "unbind_sub_gw":  # Unbind sub-device
                 pass
-            elif msg["eventType"] == "gateway_online":  # 网关在线
+            elif msg["eventType"] == "gateway_online":  # gateway online
                 pass
-            elif msg["eventType"] == "gateway_offline":  # 网关离线
+            elif msg["eventType"] == "gateway_offline":  # gateway offline
                 pass
-            elif msg["eventType"] == "subdevice_online":  # 子设备在线
+            elif msg["eventType"] == "subdevice_online":  # sub-device online
                 pass
-            elif msg["eventType"] == "subdevice_offline":  # 子设备离线
+            elif msg["eventType"] == "subdevice_offline":  # sub-device offline
                 pass
-            else:  # 其他事件暂不处理
+            else:  # Other events are not currently processed
                 pass
 
     async def async_refresh_all_devices(self):
-        """获取Aiot所有设备"""
+        """Get Aiot All Devices"""
         self._all_devices = {}
         results = await self._session.async_query_all_devices_info()
         [self._all_devices.setdefault(x["did"], AiotDevice(**x)) for x in results]
@@ -306,11 +306,10 @@ class AiotManager:
         devices: list[AiotDevice],
         auto_add_sub_devices=False,
     ):
-        await self.async_refresh_all_devices()  # 刷新一次所有设备列表
+        await self.async_refresh_all_devices()  # Refresh all device lists once
         self._entries_devices.setdefault(config_entry.entry_id, [])
         self._config_entries[config_entry.entry_id] = config_entry
         for device in devices:
-            # 这里看情况检查did是否已经存在，理论上来说应该不会重复，现在代码未做重复判断
             if device.is_supported:
                 self._managed_devices[device.did] = device
                 self._entries_devices[config_entry.entry_id].append(device.did)
@@ -357,7 +356,7 @@ class AiotManager:
     async def async_add_entities(
         self, config_entry: ConfigEntry, entity_type: str, t, async_add_entities
     ):
-        """根据ConfigEntry创建Entity"""
+        """Create Entity based on ConfigEntry"""
         devices = []
         [
             devices.append(self._managed_devices[x])
@@ -369,9 +368,9 @@ class AiotManager:
             self._devices_entities.setdefault(device.did, [])
             params = AIOT_DEVICE_MAPPING[device.model][entity_type]
             ch_count = None
-            # 这里需要处理特殊设备
+            # special equipment is required here
             if device.model == "lumi.airrtc.vrfegl01":
-                # VRF空调控制器
+                # VRF air conditioner controller
                 resp = await self._session.async_query_resource_value(
                     device.did, ["13.1.85"]
                 )

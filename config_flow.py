@@ -89,14 +89,14 @@ class AqaraBridgeFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     )
                     return await self.async_step_select_devices()
                 else:
-                    # TODO 这里要处理API失败的情况
+                    # TODO Here we need to handle the situation where the API fails
                     pass
             else:
                 resp = await self._session.async_get_auth_code(self.account, 0)
                 if resp["code"] == 0:
                     return await self.async_step_get_token()
                 else:
-                    # TODO 这里要处理API失败的情况
+                    # TODO Here we need to handle the situation where the API fails
                     pass
 
         return self.async_show_form(
@@ -161,7 +161,7 @@ class AqaraBridgeFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="complete")
 
         devlist = {}
-        await self._device_manager.async_refresh_all_devices()  # 刷新一下
+        await self._device_manager.async_refresh_all_devices()  # refresh
         [
             devlist.setdefault(x.did, f"{x.device_name} - {x.model}")
             for x in self._device_manager.unmanaged_gateways

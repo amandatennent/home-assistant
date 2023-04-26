@@ -44,7 +44,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 class AiotClimateEntity(AiotEntityBase, ClimateEntity):
-    """VRF空调控制器，特殊资源定义，https://opendoc.aqara.cn/docs/%E4%BA%91%E5%AF%B9%E6%8E%A5%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/%E9%99%84%E5%BD%95/%E7%89%B9%E6%AE%8A%E8%B5%84%E6%BA%90%E5%AE%9A%E4%B9%89.html"""
+    """VRF air conditioner controller, special resource definition: https://opendoc.aqara.cn/docs/%E4%BA%91%E5%AF%B9%E6%8E%A5%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/%E9%99%84%E5%BD%95/%E7%89%B9%E6%AE%8A%E8%B5%84%E6%BA%90%E5%AE%9A%E4%B9%89.html"""
 
     def __init__(self, hass, device, res_params, channel=None, **kwargs):
         AiotEntityBase.__init__(self, hass, device, res_params, TYPE, channel, **kwargs)
@@ -84,13 +84,13 @@ class AiotClimateEntity(AiotEntityBase, ClimateEntity):
 
     def convert_attr_to_res(self, res_name, value):
         if res_name == "ac_state":
-            # res_value：二进制字符串
+            # res_value: binary string
             return int(value, 2)
         return super().convert_attr_to_res(res_name, value)
 
     def convert_res_to_attr(self, res_name, res_value):
         if res_name == "ac_state":
-            # res_value: 十进制字符串
+            # res_value: decimal string
             return bin(int(res_value))[2:].zfill(32)
         return super().convert_res_to_attr(res_name, res_value)
 
